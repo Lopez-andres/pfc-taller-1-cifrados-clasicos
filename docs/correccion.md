@@ -1,145 +1,185 @@
-# Ejemplo de informe de corrección
 
-Fundamentos de Programación Funcional y Concurrente.
-Documento realizado por el docente Juan Francisco Díaz.
+
+#  Informe de Corrección taller 1: Cifrados Clásicos
+
+Asignatura de Fundamentos de Programación Funcional y Concurrente.
+Documento realizado por estudiantes.
 
 ## 1. Argumentar la corrección de programas recursivos
 
-Sea $f : A \to B$ una función, y $A$ un conjunto definido recursivamente
-(recordar la definición de Matemáticas Discretas I), como por ejemplo los
-naturales o las listas.
+## Punto 1. Cifrado César recursivo Lineal 
 
-Sea $P_f$ un programa recursivo (lineal o en árbol) desarrollado en Scala (o en
-cualquier lenguaje de programación) hecho para calcular $f$:
+Sea: 
+$$
+f:Mensaje×Z→Mensajef : \text{Mensaje} \times \mathbb{Z} \to \text{Mensaje}
+$$
 
-```scala
-def Pf(a: A): B = { // Pf recibe a de tipo A, y devuelve f(a) de tipo B
-  ...
-}
-```
+La función que aplica un desplazamiento (k) a
+cada letra minúscula de un mensaje. Es decir las letras se desplazan dentro del alfabeto de 26 letras,
+no obstante los caracteres que no son minúsculas se mantienen sin cambios.
 
-¿Cómo argumentar que $P_f(a)$ siempre devuelve $f(a)$ como respuesta? Es decir,
-¿cómo argumentar que $P_f$ es correcto con respecto a su especificación?
+Sea $P_f$ el programa de escala que implementa el cifrado cesar mediante recursión.
 
-La respuesta es sencilla: demostrando el siguiente teorema.
+ Se desea demostrar que:
 
-```math
-\forall a \in A : P_f(a) == f(a)
-```
+$$
+forall m \in \text{Mensaje}, \forall k \in \mathbb{Z} : P_f(m,k) == f(m,k)
+$$
 
-Cuando uno tiene que demostrar que algo se cumple para todos los elementos de
-un conjunto definido recursivamente, es natural usar inducción estructural. En
-términos prácticos, esto significa demostrar que:
+La demostración se realiza mediante inducción estructural sobre el mensaje.
 
-- Para cada valor básico $a$ de $A$, se tiene que $P_f(a) == f(a)$.
-- Para cada valor $a \in A$ construido recursivamente a partir de otro(s)
-  valor(es) $a' \in A$, se tiene que
-  $P_f(a') == f(a') \rightarrow P_f(a) == f(a)$. (Esta es la hipótesis de
-  inducción).
+### Caso base: $m = ""$
 
-### Ejemplo: factorial recursivo
+Cuando el mensaje está vacío, la función no tienen caracteres que procesar y devuelve una cadena vacía:
 
-Sea $f : \mathbb{N} \to \mathbb{N}$ la función que calcula el factorial de un
-número natural, es decir, $f(n) = n!$. Y sea $P_f$ el siguiente programa en
-Scala:
+$$
+P_f("",k) \rightarrow ""
+$$
 
-```scala
-def Pf(n: Int): Int = { // Pf recibe n de tipo Int, y devuelve n! de tipo Int
-  if (n == 0) 1 else n * Pf(n - 1)
-}
-```
+Por otro lado, según la especificación del cifrado cesar, el resultado de cifra un mensaje vacío también es vacío:
 
-Vamos a demostrar que $\forall n \in \mathbb{N} : P_f(n) == n!$
+$$
+P_f("",k) = ""
+$$
 
-**Caso base:** $n = 0$
+Por lo tanto:
 
-```math
-P_f(0) \rightarrow \text{if } (0 == 0)\ 1 \text{ else } 0 \ast P_f(-1) \rightarrow 1
-```
+$$
+P_f("",k) == f("",k)
+$$
 
-Por otro lado, $f(0) = 0! = 1$. Entonces $P_f(0) == f(0)$.
+Así, se cumple el caso base.
 
-**Caso de inducción:** $n = k + 1$, $k \geq 0$. Hay que demostrar:
-$P_f(k) == f(k) \rightarrow P_f(k + 1) == f(k + 1)$
+### Caso de inducción
 
-```math
-P_f(k+1) \rightarrow \text{if } (k+1 == 0)\ 1 \text{ else } (k+1) \ast P_f(k) \rightarrow (k+1) \ast P_f(k)
-```
+Sea:
 
-Usando la hipótesis de inducción (HI):
+$$ 
+m= c + r
+$$
 
-```math
-\rightarrow (k+1) \ast k! = (k+1)!
-```
+Donde $c$ es el primer carácter o letra del mensaje y $r$ es el resto del mensaje.
 
-Por lo tanto, $P_f(k + 1) == f(k + 1)$.
+**La hipótesis de inducción es:**
 
-Concluimos por inducción que $\forall n \in \mathbb{N} : P_f(n) == n!$
+$$
+P_f(r,k) == f(r,k)
+$$
 
-### Ejemplo: el máximo de una lista
+tesis:
 
-Sea $f : \text{List}[\mathbb{N}] \to \mathbb{N}$ la función que calcula el
-máximo de una lista de enteros positivos, no vacía. Y sea $P_f$ el siguiente
-programa en Scala:
+$$
+P_f(c+r,k) == f(c+r,k)
+$$
 
-```scala
-def maxLin(l: List[Int]): Int = {
-  if (l.tail.isEmpty) l.head
-  else math.max(maxLin(l.tail), l.head)
-}
-```
+Para demostrar la tesis, se analiza el primer carácter $c$ del mensaje. La función obtiene este carácter mediante  
+$m.head$ y lo almacena en la variable $c$. posteriormente, utiliza $esMinuscula(c)$ para demostrar si dicho carácter
+corresponde a una letra minúscula.
 
-Demostraremos que:
+##Primer caso: $c$ es una letra minúscula.
 
-```math
-\forall n \in \mathbb{N} \setminus \{0\} : P_f(\text{List}(a_1, a_2, \ldots, a_n)) == f(\text{List}(a_1, a_2, \ldots, a_n))
-```
+si c es una letra minúscula, el programa calcula su posición dentro del alfabeto
+mediante:
 
-**Caso base:** $n = 1$
+$$
+\text{ubicacionInicial} = c.toInt - \text{uprimera}
+$$
 
-```math
-P_f(\text{List}(a_1)) \rightarrow \text{if } \text{List}(a_1).\text{tail.isEmpty then } \text{List}(a_1).\text{head else } \ldots \rightarrow \text{List}(a_1).\text{head} \rightarrow a_1
-```
+Después, calcula la nueva posición aplicando el desplazamiento k:
 
-Por otro lado, $f(\text{List}(a_1)) = a_1$. Entonces
-$P_f(\text{List}(a_1)) == f(\text{List}(a_1))$.
+$$
+\text{ubicacionNueva} = ((ubicacionInicial + k)\bmod 26 + 26)\bmod 26
+$$
 
-**Caso de inducción:** $n = k + 1$, $k \geq 1$. Se debe demostrar:
+Esta operación permite mantener la posición de la letra dentro del intervalo de 0 a 25
+incluso cuando el desplazamiento $k$ es negativo.
 
-```math
-P_f(\text{List}(b_1, b_2, \ldots, b_k)) == f(\text{List}(b_1, b_2, \ldots, b_k)) \rightarrow P_f(\text{List}(a_1, a_2, \ldots, a_{k+1})) == f(\text{List}(a_1, a_2, \ldots, a_{k+1}))
-```
+A continuación, se obtiene la nueva letra:
 
-Empecemos por calcular qué devuelve $P_f$ usando el modelo de sustitución:
+$$
+\text{letraNueva} = (\text{ubicacionNueva} + \text{primera}).toChar
+$$
 
-```math
-P_f(L) \rightarrow \text{if } L.\text{tail.isEmpty then } L.\text{head else math.max}(P_f(L.\text{tail}), L.\text{head})
-```
+Al obtener la nueva letra el programa realiza la llamada recursiva sobre el resto del mensaje.
 
-```math
-\rightarrow \text{math.max}(P_f(\text{List}(a_2, \ldots, a_{k+1})), a_1)
-```
+$$
+P_f(c+r,k) \rightarrow \text{letraNueva} + P_f(r,k)
+$$
 
-Sea $b = P_f(\text{List}(a_2, \ldots, a_{k+1}))$; por la hipótesis de
-inducción, $b = f(\text{List}(a_2, \ldots, a_{k+1}))$. Hay dos posibilidades:
+**Aplicando la hipótesis de inducción:**
 
-- Si $\text{math.max}(b, a_1) = b$, entonces $b \geq a_1$ y
- $b == f(\text{List}(a_1, a_2, \ldots, a_{k+1}))$.
-- Si $\text{math.max}(b, a_1) = a_1$, entonces $a_1 \geq b$ y
- $a_1 == f(\text{List}(a_1, a_2, \ldots, a_{k+1}))$.
+$$
+P_f(r,k) == f(r,k)
+$$
 
-Por lo tanto, $P_f(L) == f(L)$.
+Por lo tanto:
 
-Concluimos por inducción que:
+$$
+\text{LetraNueva} + P_f(r,k) = \text{letraNueva} + f(r,k)
+$$
 
-```math
-\forall n \in \mathbb{N} \setminus \{0\} : P_f(\text{List}(a_1, a_2, \ldots, a_n)) == f(\text{List}(a_1, a_2, \ldots, a_n))
-```
+Por definición del cifrado cesar, $\text{letraNueva}$ corresponde al resultado de aplicar el desplazamiento $k$
+al carácter $c$. Además, $f(r,k)$ corresponde al resultado de aplica el mismo deplazamiento al resto del mensaje.
 
-## 2. Argumentar la corrección de programas iterativos
+por lo tanto:
+$$
+\text{nuevaletra} + f(r,k) = f(c+r,k) 
+$$
 
-Para argumentar la corrección de programas iterativos, se debe formalizar cómo
-es la iteración. Esto implica definir:
+Así:
+$$
+P_f(c+r,k)==f(c+r,k)
+$$
+
+## segundo Caso: $c$ no es una letra minúscula.
+
+Si $c$ no es minúscula el programa conserva el carácter sin modificaciones y realiza la llamada recursiva sobre el resto del mensaje.
+$$
+P_f(c+r,k) \rightarrow c+P_f(r,k)
+$$
+
+**Aplicamos la hipotesis de inducción**
+
+$$
+P_f(r,k) == f(r,k)
+$$
+
+Entonces:
+ 
+$$
+c+ P_f(r,k) \rightarrow c+f(r,k)
+$$
+
+Como los caracteres que no son letras minúsculas se mantienen sin cambios: 
+
+$$ 
+c+f(r,k) = f(c+r,k)
+
+Por lo tanto:
+$$
+P_f(c+r,k)==f(c+r,k)
+$$
+
+En ambos casos se cumple la tesis de inducción.
+
+**Conclusión**
+
+Como se cumple el caso base y se ha demostrado que, suponiendo la hipótesis de inducción, se cumple la 
+tesis para mensaje formado por un primer carácter y el resto del mensaje por inducción estructural se contruye que:
+
+$$
+forall m 
+\in \text{Mensaje}, \forall k \in \mathbb{Z} : P_f(m,k) == f(m,k)
+$$
+
+Es decir el programa recursivo lineal que implementa el cifrado cesar es correcto con respecto a su especificaciónes.
+
+
+##  2. Argumentar la corrección de programas iterativos
+
+Para argumentar la corrección del proceso utilizando en la recursión de cola, se formalizan los estados de la ejecución
+
+Se define:
 
 - Cómo se representa un estado de la iteración, $s$.
 - Cuál es el estado inicial, $s_0$.
@@ -149,131 +189,307 @@ es la iteración. Esto implica definir:
 - El mecanismo para pasar de un estado al siguiente: $\text{transformar}(s)$.
   Si $s_i$ es el estado $i$, entonces $\text{transformar}(s_i) = s_{i+1}$.
 
-Un programa iterativo tiene la siguiente forma:
+Para argumentar la corrección del proceso se debe demostrar que:
+-1. La invariante se cumple en el estado inicial.
+-2. La transformación conserva la invariante
+-3. Cuando se alcanza el estado final, la invariante permite obtener el resultado correcto.
+-4. El proceso alcanza el estado final
 
-```scala
-def Pf(a: A): B = { // Pf recibe a de tipo A, y devuelve f(a) de tipo B
-  def Pf_iter(s: Estado): B =
-    if (esFinal(s)) respuesta(s) else Pf_iter(transformar(s))
-  Pf_iter(s0)
-}
-```
+## Punto 2: Cifrado cesarCola mediante recursión de cola
 
-Demostración de corrección:
+Sea:
 
-- $\text{Inv}(s_0)$: el estado inicial cumple la condición invariante.
-- Si $(s_i \neq s_f \land \text{Inv}(s_i)) \rightarrow \text{Inv}(\text{transformar}(s_i))$:
-  el nuevo estado cumple la condición invariante si el estado anterior la
-  cumplía.
-- De lo anterior se concluye $\text{Inv}(s_f)$, es decir, el estado final
-  cumple la condición invariante. Luego,
-  $\text{Inv}(s_f) \rightarrow \text{respuesta}(s_f) == f(a)$.
-- Finalmente, demostrar que siempre se llega al estado final $s_f$. Esto
-  implica que
-  $P_f(a) == \text{iter}(s_0) == \text{respuesta}(s_f) == f(a)$.
+$$
+f:Mensaje×Z→Mensajef : \text{Mensaje} \times \mathbb{Z} \to \text{Mensaje}
+$$
 
-### Ejemplo: factorial iterativo
+La función aplica un desplazamiento $k$ a cada letra minúscula de un mensaje.
+Los carácteres que no son letras minúsculas se mantiene sin cambios.
 
-Considere el siguiente programa iterativo en Scala para calcular la función
-factorial:
+Sea $P_f$ el programa de escala que implementa el cifrado cesar mediante recursión.
 
-```scala
-def Pf(n: Int): Int = { // Pf recibe n de tipo Int, y devuelve n! de tipo Int
-  def Pf_iter(i: Int, n: Int, ac: Int): Int =
-    if (i > n) ac else Pf_iter(i + 1, n, i * ac)
-  Pf_iter(1, n, 1)
-}
-```
+Se desea demostrar que:
 
-Este programa implementa el siguiente proceso iterativo:
+$$
+forall m \in \text{Mensaje}, \forall k \in \mathbb{Z} : P_f(m,k) == f(m,k)
+$$
 
-- Un estado $s = (i, n, ac)$.
-- El estado inicial es $s_0 = (1, n, 1)$.
-- $(i, n, ac)$ es final si $i > n$, o lo que es lo mismo, si $i = n + 1$.
-- La invariante de ciclo es
-  $\text{Inv}(i, n, ac) \equiv i \leq n + 1 \land ac = (i-1)!$.
-  La invariante de ciclo es una relación que SIEMPRE se cumple en el ciclo.
-- $\text{transformar}((i, n, ac)) = (i+1, n, i \ast ac)$.
+El programa utiliza un acumulador $acc$; Este acumulador permite guardar el resultado que ya ha sido construido
+mientras la función continúa procesando el mensaje.
 
-Ahora, demostramos los puntos mencionados:
+Por esta razón, la demostración se realiza siguiendo los estados del proceso y verificando que una
+propiedad, llamada invariante, se mantiene durante cada transformación.
 
-**1.** $\text{Inv}(s_0)$: el estado inicial cumple la condición invariante.
+## Estado de ejecución 
 
-```math
-s_0 = (1, n, 1) \implies 1 \leq n + 1 \land 1 = 0!
-```
+Sea $m$ el mensaje original.
 
-**2.** La invariante se mantiene con la transformación de estados,
-$(s_i \neq s_f \land \text{Inv}(s_i)) \rightarrow \text{Inv}(\text{transformar}(s_i))$:
+la función cesarCola recibe tres elementos:
+*+cesarCola(m,k,acc)
 
-1. Primer cambio, $i = i + 1$, lo que implica $ac = ((i+1) - 1)! = i!$.
-2. Segundo cambio, $ac = i \ast ac$, entonces $ac = (i - 1)! \ast i = i!$.
-3. Como se puede ver en ambos cambios indicados en la transformación, la
-   invariante se mantiene.
+-- $m$ es la parte del mensaje que falta por procesar.
+-- $k$ es el desplazador.
+-- $acc$ es la parte del resultado que ya ha sido procesada.
 
-**3.** $\text{Inv}(s_f) \rightarrow \text{respuesta}(s_f) == f(a)$
+Por lo tanto, el estado del proceso se representa mediante:
 
-```math
-(n + 1 \leq n + 1) \land ac = ((n+1)-1)! \rightarrow ac == n!
-```
+$$
+s=(m,k,acc)
+$$
 
-**4.** En cada paso, la componente $i$ del estado incrementa, acercándose a $n+1$.
-Después de $n$ iteraciones, se alcanza $n+1$.
 
-Esto implica que $P_f(n) == \text{iter}(1, n, 1) == n!$
+El estado inicial donde todavía no se ha procesado ningún carácter es:
 
-### Ejemplo: el máximo de una lista
+$$
+s_O =(m,k,"")
+$$
 
-Se desea calcular el máximo de una lista de enteros positivos, no vacía. Sea
-$f : \text{List}[\mathbb{N}] \to \mathbb{N}$ la función que calcula ese valor.
-Y sea $P_f$ el siguiente programa en Scala:
+En otras palabras, al inicio todo el mensaje está pendiente y el acumulador està vacío.
 
-```scala
-def maxIt(l: List[Int]): Int = {
-  def maxAux(max: Int, l: List[Int]): Int = {
-    if (l.isEmpty) max
-    else maxAux(math.max(max, l.head), l.tail)
-  }
-  maxAux(l.head, l.tail)
-}
-```
+El estado es final cuando no quedan caracteres por procesar:
 
-Este programa implementa el siguiente proceso iterativo:
+$$
+s_f=("",k,acc)
+$$
 
-- Un estado $s = (max, l)$ donde $l = \text{List}(a_i, a_{i+1}, \ldots, a_k)$
-  es una cola de $L$.
-- El estado inicial es
-  $s_0 = (L.\text{head}, L.\text{tail}) = (a_1, \text{List}(a_2, \ldots, a_k))$.
-- $s = (max, l)$ es final si $l$ es vacía.
-- $\text{Inv}(max, l) \equiv l = \text{List}(a_i, a_{i+1}, \ldots, a_k) \land max = f(\text{List}(a_1, a_2, \ldots, a_{i-1}))$.
-- $\text{transformar}((max, l)) = (nmax, l.\text{tail})$ donde $nmax = max$ si
-  $max \geq l.\text{head}$, y $nmax = l.\text{head}$ si no.
+La transformación consíste en procesar el primer carácter de $m$, agregando el resultado al acumuladr y 
+continuar con el resto del mensaje.
 
-Demostración de los puntos:
+La invariante que se utilizará es:
+ 
+$$
+\text{Inv}(m,k,acc)
+\equiv
+acc+f(m,k)=f(m,k)
+$$
 
-**1.** $\text{Inv}(s_0)$: el estado inicial cumple la condición invariante.
+Lo que ya està guardado en $acc$, junto con el resultado de cifrar la parte del mensaje que todavía falta por
+procesar, debe ser igual al cifrado del mensaje original.
 
-```math
-s_0 = (a_1, \text{List}(a_2, \ldots, a_k)) \implies a_1 = f(\text{List}(a_1))
-```
+ejemplo: si una parte de msj ya fue procesada y se encuentra en acc, entonces
+el resto del msj todavía en $m$. la suma de esas dos parte debe corresponder al resultado final
 
-**2.** $(s_i \neq s_f \land \text{Inv}(s_i)) \rightarrow \text{Inv}(\text{transformar}(s_i))$
+## 1. la invariante se cumple en el estado inicial  
 
-```math
-\neg\, l.\text{isEmpty} \land l = \text{List}(a_i, a_{i+1}, \ldots, a_k) \land max = f(\text{List}(a_1, a_2, \ldots, a_{i-1}))
-```
+El estado inicial es:
 
-```math
-\rightarrow l.\text{tail} = \text{List}(a_{i+1}, \ldots, a_k) \land nmax = f(\text{List}(a_1, \ldots, a_i))
-```
+$$
+s_O=(m,k,"")
+$$
 
-**3.** $\text{Inv}(s_f) \rightarrow \text{respuesta}(s_f) == f(a)$
+Para comprobar que la invariante se cumple desde el comienzo, reemplazamos $m$
+po $M$ y acc por el mensaje vacío:
 
-```math
-\text{Inv}((max, \text{List}())) \rightarrow max = f(\text{List}(a_1, \ldots, a_k))
-```
 
-**4.** En cada paso, la lista $l$ se reduce, acercándose a ser vacía. Después de
-$k$ iteraciones, $l = \text{List}()$.
+$$
+""+f(M,k)=f(M,k)
+$$
 
-Esto implica que $P_f(L) == \text{maxAux}(L.\text{head}, L.\text{tail}) == f(L)$
+Como concatenar un mensaje vacío no modificar el resultado.
+
+$$ 
+f(M,k)=f(M,k)
+$$
+
+Por lo tanto, la invariante se cumple en el estado inicial.
+Esto quiere decir que desde el comienzo se cumple la propiedad que queremos
+conservar durante toda la ejecución.
+
+## 2. La invariante se conserva durante el proceso.
+
+Supongamos que todavía queda una parte del mensaje por procesar.
+
+Lo representaremos como:
+
+$$
+m=c+r 
+$$
+
+Donde $C$ representa el primer carácter del mensaje que falta por procesar y $r$ representa el resto del mensaje.
+
+Suponemos que antes de procesar $c$ la invariante ya se cumple:
+
+$$
+acc+f(c+r,k)=f(M,k)
+$$
+
+Ahora se debe comprobar que después de procesar el carácter $c$, la invariante continùa cumpliéndose.
+
+**Se representa dos casos:**
+
+## caso 1: $C$ es una letra minúscula
+
+Cuando $c$ es una letra minúscula, el programa calcula la letra correspondiente despues
+de aplicar el desplazamiento $k$.
+
+Sea:
+
+$$
+\text{letraNueva}=\text{cifrar}(c,k)
+$$
+
+El programa agrega esta letra al acumulador $acc$ y continua con el resto del mensaje.
+Por lo tanto, la transformación del estado es:
+
+$$
+(c+r,k,acc)
+\rightarrow
+(r,k,acc+\text{letraNueva})
+$$
+
+Esto representa exactamente lo que hace el programa: el primer carácter $c$ ya fue procesado,
+se agregó su resultado al acumulador y ahora queda $r$ por procesar.
+
+Para el nuevo estado se debe comprobar que la invariante continùa cumpliéndose:
+
+$$
+(acc+text{letraNueva})+f(r,k)=f(M,k)
+$$
+
+Por definición del cifrado cesar, cifrar primero $c$ y luego cifrar $r$ produce el mismo resultado que cifrar todo $c+r$
+
+$$
+\text{letraNueva}+f(r,k)=f(c+r,k)
+$$
+
+Por lo tanto:
+$$
+acc+f(c+r.k)
+$$
+y como inicialmente se cumple al invariante:
+$$
+acc+f(c+r,k)=f(m,k)
+$$
+Entonces:
+$$
+(acc+letraNueva)+f(r,k)=f(m,k)
+$$
+
+Por lo tanto, la invariante se mantiene después procesar una letra minúscula.
+
+## caso 2: $c$ no es una letra minúscula
+
+Cuando $c$ es una letra minúscula, el carácter se conserva sin cambios. El programa lo agrega
+al acumulador $acc$ y continúa con el resto del mensaje.
+
+
+La transformación del estado es:
+
+$$
+(c+r,k,acc)
+\rightarrow
+(r,k,acc+c)
+$$
+
+Para el nuevo estado debemos demostrar que:
+
+$$
+(acc+c)+f(r,k)=f(M,k)
+$$
+
+Como $c$ no es una letra minúscula, el cifrado cesar lo mantiene sin cambios.
+
+Por lo tanto:
+$$
+c+f(r,k)=(c+r,k)
+$$
+Entonces:
+$$
+acc+f(c+r,k)
+$$
+ y por la invariante que se tenía antes de procesar $C$
+
+$$ 
+acc+f(c+r,k)=f(M,k)
+$$
+Por lo tanto:
+$$
+(acc+c)´f(r,k)=f(M,k)
+$$
+
+Asi, la invariante también se mantiene cuando $c$ no es una letra minúscula.
+En ambos casos, la transformación conserva la invariante.
+
+## 3. Corrección en el estado final
+
+El estado final se alcanza cuado no queda caracteres por procesar.
+
+$$
+s_f= ("",k,acc)
+$$
+
+En este estado, la invariante establece que:
+
+$$
+acc+f("",k)=f(M,k)
+$$
+
+como el cifrado de un mensaje vacío es un mensaje vacío
+
+$$
+f("",k)=""
+$$
+
+Entonces:
+
+$$
+acc+""=f(M,k)
+$$
+
+Por lo tanto:
+
+$$
+acc=f(M,k)
+$$
+
+Cunado el programa encuentra que el mensaje está vacío, retorna el acumulado.
+
+$$
+P_f("",k,acc)\rightarrow acc
+$$
+
+Como acabamos de demotras que:
+$$
+acc=f(M,k)
+$$
+
+Se concluye que:
+
+$$
+P_f(M,k)=f(M,k)
+$$
+
+EN esta parte cuando el programa termina, el acumulador contiene exactamente el resultado correcto
+del cifrado cesar
+
+## 4. el proceso alcanza la face final 
+
+Finalmente, se debe comprobar que el programa realmente llege al esatado final.
+
+En cada llamada recursiva, el programa toma el primer carácter del mensaje mediante
+m.head y continúa con el resto del mensaje mediante $m.tail$.
+
+Por lo tanto, el mensaje pendiente disminuye en un carácter en cada llamada:
+
+$$
+c+r\rightarrow r
+$$
+
+Después de procesar todos los carácteres, el mensaje pendiente queda vacío.
+
+$$
+m=""
+$$
+Por lo tanto, el proceso alcanza el estado final:
+
+$$
+s_F=("",k,acc)
+$$
+
+## Conclusión
+
+Se ha demostrado que la invariante se cumple en el estado inicial, se conserva durante cada trasformación y permite obtener el resultado
+correcto cuando se alcanza el estado final. Además, el proceso alcanza dicho estado porque en cada
+llamada recursiva se elimina un carácter del mensaje pendiente.
+
+Por ultimo el programa cesarCola es correcto con respeto a la especificación del cifrado cesar.
