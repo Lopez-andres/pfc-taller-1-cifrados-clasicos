@@ -11,7 +11,7 @@ Documento realizado por estudiantes.
 
 Sea: 
 $$
-f:Mensaje×Z→Mensajef : \text{Mensaje} \times \mathbb{Z} \to \text{Mensaje}
+f: \text{Mensaje} \times \mathbb{Z} \to \text{Mensaje}
 $$
 
 La función que aplica un desplazamiento (k) a
@@ -23,7 +23,7 @@ Sea $P_f$ el programa de escala que implementa el cifrado cesar mediante recursi
  Se desea demostrar que:
 
 $$
-forall m \in \text{Mensaje}, \forall k \in \mathbb{Z} : P_f(m,k) == f(m,k)
+\forall m \in \text{Mensaje}, \forall k \in \mathbb{Z} : P_f(m,k) == f(m,k)
 $$
 
 La demostración se realiza mediante inducción estructural sobre el mensaje.
@@ -66,7 +66,7 @@ $$
 P_f(r,k) == f(r,k)
 $$
 
-tesis:
+Tesis:
 
 $$
 P_f(c+r,k) == f(c+r,k)
@@ -78,11 +78,11 @@ corresponde a una letra minúscula.
 
 ##Primer caso: $c$ es una letra minúscula.
 
-si c es una letra minúscula, el programa calcula su posición dentro del alfabeto
+Si $c$ es una letra minúscula, el programa calcula su posición dentro del alfabeto
 mediante:
 
 $$
-\text{ubicacionInicial} = c.toInt - \text{uprimera}
+\text{ubicacionInicial} = c.toInt - \text{primera}
 $$
 
 Después, calcula la nueva posición aplicando el desplazamiento k:
@@ -115,15 +115,15 @@ $$
 Por lo tanto:
 
 $$
-\text{LetraNueva} + P_f(r,k) = \text{letraNueva} + f(r,k)
+\text{LetraNueva} + P_f(r,k) \rightarrow \text{letraNueva} + f(r,k)
 $$
 
 Por definición del cifrado cesar, $\text{letraNueva}$ corresponde al resultado de aplicar el desplazamiento $k$
-al carácter $c$. Además, $f(r,k)$ corresponde al resultado de aplica el mismo deplazamiento al resto del mensaje.
+al carácter $c$. Además, $f(r, k)$ corresponde al resultado de aplicar el mismo desplazamiento al resto del mensaje.
 
-por lo tanto:
+Por lo tanto:
 $$
-\text{nuevaletra} + f(r,k) = f(c+r,k) 
+\text{nuevaletra} + f(r0, k) = f(c+r, k) 
 $$
 
 Así:
@@ -131,11 +131,11 @@ $$
 P_f(c+r,k)==f(c+r,k)
 $$
 
-## segundo Caso: $c$ no es una letra minúscula.
+## Segundo Caso: $c$ no es una letra minúscula.
 
 Si $c$ no es minúscula el programa conserva el carácter sin modificaciones y realiza la llamada recursiva sobre el resto del mensaje.
 $$
-P_f(c+r,k) \rightarrow c+P_f(r,k)
+P_f(c+r, k) \rightarrow c+P_f(r, k)
 $$
 
 **Aplicamos la hipotesis de inducción**
@@ -168,14 +168,14 @@ Como se cumple el caso base y se ha demostrado que, suponiendo la hipótesis de 
 tesis para mensaje formado por un primer carácter y el resto del mensaje por inducción estructural se contruye que:
 
 $$
-forall m 
+\forall m 
 \in \text{Mensaje}, \forall k \in \mathbb{Z} : P_f(m,k) == f(m,k)
 $$
 
 Es decir el programa recursivo lineal que implementa el cifrado cesar es correcto con respecto a su especificaciónes.
 
 
-##  2. Argumentar la corrección de programas iterativos
+##  2.1 Argumentar la corrección de programas iterativos
 
 Para argumentar la corrección del proceso utilizando en la recursión de cola, se formalizan los estados de la ejecución
 
@@ -190,18 +190,19 @@ Se define:
   Si $s_i$ es el estado $i$, entonces $\text{transformar}(s_i) = s_{i+1}$.
 
 Para argumentar la corrección del proceso se debe demostrar que:
--1. La invariante se cumple en el estado inicial.
--2. La transformación conserva la invariante
--3. Cuando se alcanza el estado final, la invariante permite obtener el resultado correcto.
--4. El proceso alcanza el estado final
+
+- La invariante se cumple en el estado inicial.
+- La transformación conserva la invariante
+- Cuando se alcanza el estado final, la invariante permite obtener el resultado correcto.
+- El proceso alcanza el estado final.
 
 ## Punto 2: Cifrado cesarCola mediante recursión de cola
 
 Sea:
+$$
+f: \text{Mensaje} \times \mathbb{Z} \to \text{Mensaje}
+$$
 
-$$
-f:Mensaje×Z→Mensajef : \text{Mensaje} \times \mathbb{Z} \to \text{Mensaje}
-$$
 
 La función aplica un desplazamiento $k$ a cada letra minúscula de un mensaje.
 Los carácteres que no son letras minúsculas se mantiene sin cambios.
@@ -211,7 +212,7 @@ Sea $P_f$ el programa de escala que implementa el cifrado cesar mediante recursi
 Se desea demostrar que:
 
 $$
-forall m \in \text{Mensaje}, \forall k \in \mathbb{Z} : P_f(m,k) == f(m,k)
+\forall m \in \text{Mensaje}, \forall k \in \mathbb{Z} : P_f(m,k) == f(m,k)
 $$
 
 El programa utiliza un acumulador $acc$; Este acumulador permite guardar el resultado que ya ha sido construido
@@ -224,8 +225,8 @@ propiedad, llamada invariante, se mantiene durante cada transformación.
 
 Sea $m$ el mensaje original.
 
-la función cesarCola recibe tres elementos:
-*+cesarCola(m,k,acc)
+La función cesarCola recibe tres elementos:
+**cesarCola(m, k, acc)**
 
 -- $m$ es la parte del mensaje que falta por procesar.
 -- $k$ es el desplazador.
@@ -244,7 +245,7 @@ $$
 s_O =(m,k,"")
 $$
 
-En otras palabras, al inicio todo el mensaje está pendiente y el acumulador està vacío.
+En otras palabras, al inicio todo el mensaje está pendiente y el acumulador está vacío.
 
 El estado es final cuando no quedan caracteres por procesar:
 
@@ -263,11 +264,11 @@ $$
 acc+f(m,k)=f(m,k)
 $$
 
-Lo que ya està guardado en $acc$, junto con el resultado de cifrar la parte del mensaje que todavía falta por
+Lo que ya está guardado en $acc$, junto con el resultado de cifrar la parte del mensaje que todavía falta por
 procesar, debe ser igual al cifrado del mensaje original.
 
-ejemplo: si una parte de msj ya fue procesada y se encuentra en acc, entonces
-el resto del msj todavía en $m$. la suma de esas dos parte debe corresponder al resultado final
+Ejemplo: si una parte de msj ya fue procesada y se encuentra en acc, entonces
+el resto del msj todavía está en $m$. La suma de esas dos pártes debe corresponder al resultado final.
 
 ## 1. la invariante se cumple en el estado inicial  
 
@@ -278,7 +279,7 @@ s_O=(m,k,"")
 $$
 
 Para comprobar que la invariante se cumple desde el comienzo, reemplazamos $m$
-po $M$ y acc por el mensaje vacío:
+por $M$ y acc por el mensaje vacío:
 
 
 $$
@@ -292,6 +293,9 @@ f(M,k)=f(M,k)
 $$
 
 Por lo tanto, la invariante se cumple en el estado inicial.
+$$
+\text{Inv}(s_O)
+$$
 Esto quiere decir que desde el comienzo se cumple la propiedad que queremos
 conservar durante toda la ejecución.
 
@@ -319,7 +323,7 @@ Ahora se debe comprobar que después de procesar el carácter $c$, la invariante
 
 ## caso 1: $C$ es una letra minúscula
 
-Cuando $c$ es una letra minúscula, el programa calcula la letra correspondiente despues
+Cuando $c$ es una letra minúscula, el programa calcula la letra correspondiente, después
 de aplicar el desplazamiento $k$.
 
 Sea:
@@ -358,16 +362,19 @@ acc+f(c+r.k)
 $$
 y como inicialmente se cumple al invariante:
 $$
-acc+f(c+r,k)=f(m,k)
+acc+f(c+r, k)=f(M, k)
 $$
 Entonces:
 $$
-(acc+letraNueva)+f(r,k)=f(m,k)
+(acc+letraNueva)+f(r, k)=f(M, k)
 $$
 
 Por lo tanto, la invariante se mantiene después procesar una letra minúscula.
+$$
+\text{Inv}(r, k, acc+letraNueva)
+$$
 
-## caso 2: $c$ no es una letra minúscula
+## Caso 2: $c$ no es una letra minúscula
 
 Cuando $c$ es una letra minúscula, el carácter se conserva sin cambios. El programa lo agrega
 al acumulador $acc$ y continúa con el resto del mensaje.
@@ -391,11 +398,11 @@ Como $c$ no es una letra minúscula, el cifrado cesar lo mantiene sin cambios.
 
 Por lo tanto:
 $$
-c+f(r,k)=(c+r,k)
+c+f(r, k)=(c+r, k)
 $$
 Entonces:
 $$
-acc+f(c+r,k)
+acc+f(c+r, k)
 $$
  y por la invariante que se tenía antes de procesar $C$
 
@@ -408,6 +415,9 @@ $$
 $$
 
 Asi, la invariante también se mantiene cuando $c$ no es una letra minúscula.
+$$
+\text{Inv}(r, k, acc+c)
+$$
 En ambos casos, la transformación conserva la invariante.
 
 ## 3. Corrección en el estado final
@@ -450,7 +460,7 @@ $$
 
 Como acabamos de demotras que:
 $$
-acc=f(M,k)
+acc=f(M, k)
 $$
 
 Se concluye que:
@@ -459,7 +469,7 @@ $$
 P_f(M,k)=f(M,k)
 $$
 
-EN esta parte cuando el programa termina, el acumulador contiene exactamente el resultado correcto
+En esta parte cuando el programa termina, el acumulador contiene exactamente el resultado correcto
 del cifrado cesar
 
 ## 4. el proceso alcanza la face final 
@@ -472,7 +482,7 @@ m.head y continúa con el resto del mensaje mediante $m.tail$.
 Por lo tanto, el mensaje pendiente disminuye en un carácter en cada llamada:
 
 $$
-c+r\rightarrow r
+c+r\rightarrow 
 $$
 
 Después de procesar todos los carácteres, el mensaje pendiente queda vacío.
@@ -492,4 +502,4 @@ Se ha demostrado que la invariante se cumple en el estado inicial, se conserva d
 correcto cuando se alcanza el estado final. Además, el proceso alcanza dicho estado porque en cada
 llamada recursiva se elimina un carácter del mensaje pendiente.
 
-Por ultimo el programa cesarCola es correcto con respeto a la especificación del cifrado cesar.
+Por último el programa cesarCola es correcto con respeto a la especificación del cifrado cesar.

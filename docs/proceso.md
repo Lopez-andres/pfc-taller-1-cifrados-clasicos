@@ -4,6 +4,7 @@
 ## Definición del Algoritmo
 
 ```Scala
+ 
 def cesar(m: Mensaje, k: Int): Mensaje = {
     if (m.isEmpty){ 
       "" 
@@ -99,7 +100,7 @@ cesar("o", 3) // -> "r" + cesar("",3)
 ```Scala
 cesar ("", 3) // -> ""
 ```
-* Despuès del caso base, las llamadas pendientes comienzan a resolverse hasta tener:
+* Después del caso base, las llamadas pendientes comienzan a resolverse hasta tener:
 ```Scala
 cesar("mono") -> "prqr" 
 cesar(",3)-> " "
