@@ -49,9 +49,19 @@ class CifradosClasicos {
    * Supone que la letra más frecuente del mensaje cifrado es la 'e' del
    * original y devuelve la distancia entre las dos. Sin letras, cero.
    */
-  def desplazamientoProbable(m: Mensaje): Int = ???
+  def desplazamientoProbable(m: Mensaje): Int = {
+    val f: Frecuencias = frecuencias(m)
 
-  def romperCesar(m: Mensaje): Mensaje = ???
+    if (f.isEmpty) 0
+    else {
+      val letra = f.head._1
+      ((letra.toInt - 'e'.toInt) % letras + letras) % letras
+    }
+  }
+
+  def romperCesar(m: Mensaje): Mensaje = {
+    cesar(m, -desplazamientoProbable(m))
+  }
 
   // Punto 5 -------------------------------------------------------------------
 
@@ -59,11 +69,30 @@ class CifradosClasicos {
    * Cuántos mensajes de longitud n se forman con a letras sin dos iguales
    * seguidas.
    */
-  def combinaciones(n: Int, a: Int): BigInt = ???
+  def combinaciones(n: Int, a: Int): BigInt = {
+    if (n == 0) 1
+    else if (n == 1) a
+    else (a-1) * combinaciones(n - 1, a)
+  }
 
   /**
    * Vigenère: cada letra se corre según la letra de la clave que le toca. Lo
    * que no es letra minúscula se copia y no consume clave.
    */
-  def vigenere(m: Mensaje, clave: Clave): Mensaje = ???
+  def vigenere(m: Mensaje, clave: Clave): Mensaje = {
+    def auxClave(m: Mensaje, claveRestante: Clave): Mensaje = {
+      if (m.isEmpty) ""
+      else {
+        val claveActual = if (claveRestante.isEmpty) clave else claveRestante
+
+        val letraMensaje = m.head
+        if (esMinuscula(letraMensaje)) {
+          val indiceClave = ((letraMensaje - 'a') + (claveActual.head.toInt - 'a'.toInt) % letras + letras) % letras
+          (indiceClave + 'a').toChar + auxClave(m.tail, claveRestante)
+        } else letraMensaje + auxClave(m.tail, claveRestante)
+      }
+    }
+
+    if (clave.isEmpty) m else auxClave(m, clave)
+  }
 }
