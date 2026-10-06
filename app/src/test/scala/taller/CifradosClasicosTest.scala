@@ -35,6 +35,27 @@ class CifradosClasicosTest extends AnyFunSuite {
     assert(cesar(cesar("un mensaje cualquiera", 11), -11) == "un mensaje cualquiera")
   }
 
+
+  test("cesar: desplaza una palabra completa con un desplazamiento positivo"){
+    assert(cesar("universidad",7) == "bupclyzpkhk")
+  }
+
+  test("cesar: un desplazamiento negativo cruza el inicio del alfabeto"){
+    assert(cesar("xyz abc", -4) == "tuv wxy")
+  }
+
+  test("cesar: conserva la mayúsculas, números y signos mientras cifra el mensaje"){
+    assert(cesar("Cafe 2026!", 9) == "Cjon 2026!")
+  }
+
+  test("cesar: combina vuelta del alfabeto y desplazamiento negativo"){
+    assert(cesar("zzxy abcd", -27) =="yywx zabc")
+  }
+
+  test("cesar: un desplazamiento mayor que 26 se reduce correctamente"){
+    assert(cesar("programa", 55) == "surjudpd")
+  }
+
   // Punto 2 -------------------------------------------------------------------
 
   test("cesarCola: casa con 3 da fdvd") { assert(cesarCola("casa", 3) == "fdvd") }
@@ -47,109 +68,144 @@ class CifradosClasicosTest extends AnyFunSuite {
     assert(casos.forall { case (m, k) => cesarCola(m, k) == cesar(m, k) })
   }
 
-  test("cesarCola: aguanta un mensaje largo sin desbordar la pila") {
-    val largo = "abcdefghij" * 20000
-    assert(cesarCola(largo, 1).length == largo.length)
+  test("cesarCola: funciona con diferentes desplazamientos y conserva caracteres") {
+    val casos = List(
+      ("abc xyz", 1),
+      ("hello, world!", 13),
+      ("scala 2026", 26),
+      ("xyz abc", -2)
+    )
+    val esperados = List(
+      "bcd yza",
+      "uryyb, jbeyq!",
+      "scala 2026",
+      "vwx yza"
+    )
+    assert(casos.map { case (m, k) => cesarCola(m, k) } == esperados) //map aplica cesarCola a cada caso y genera la lista de resultados
+    // que luego se compara con la lista espera
   }
+    test("cesarCola: aguanta un mensaje largo sin desbordar la pila") {
+      val largo = "abcdefghij" * 20000
+      assert(cesarCola(largo, 1).length == largo.length)
+    }
 
-  // Punto 3 -------------------------------------------------------------------
+    test("cesarCola: cruza el final del alfabeto con varia letras") {
+      assert(cesarCola("wzyz", 3) == "zcbc")
+    }
 
-  test("frecuencias: casa") {
-    assert(frecuencias("casa") == List(('a', 2), ('c', 1), ('s', 1)))
+    test("cesarCola: cruza el inicio del alfabeto con un desplazamiento negativo") {
+      assert(cesarCola("abcd", -3) == "xyza")
+    }
+
+    test("cesarCola: un desplazamiento mayor que 26 produce el resultado equivalente") {
+      assert(cesarCola("programacion", 55) == "surjudpdflrq")
+    }
+
+    test("cesarCola: conserva mayúsculas, números y signos") {
+      assert(cesarCola("Cafe 2050!", 9) == "Cjon 2050!")
+    }
+    test("cesarCola: combina caracteres sin cifrar con letras que cruzan el alfabeto") {
+      assert(cesarCola("zz, aa!", 1) == "aa, bb!")
+    }
+    // Punto 3 -------------------------------------------------------------------
+
+    test("frecuencias: casa") {
+      assert(frecuencias("casa") == List(('a', 2), ('c', 1), ('s', 1)))
+    }
+
+    test("frecuencias: aabbbc") {
+      assert(frecuencias("aabbbc") == List(('b', 3), ('a', 2), ('c', 1)))
+    }
+
+    test("frecuencias: hola mundo") {
+      assert(frecuencias("hola mundo") ==
+        List(('o', 2), ('a', 1), ('d', 1), ('h', 1), ('l', 1), ('m', 1),
+          ('n', 1), ('u', 1)))
+    }
+
+    test("frecuencias: el mensaje vacío no tiene letras") {
+      assert(frecuencias("") == List())
+    }
+
+    test("frecuencias: un mensaje sin letras no tiene frecuencias") {
+      assert(frecuencias("123 !?") == List())
+    }
+
+    test("frecuencias: en empate manda el orden alfabético") {
+      assert(frecuencias("ba") == List(('a', 1), ('b', 1)))
+    }
+
+    // Punto 4 -------------------------------------------------------------------
+
+    test("desplazamientoProbable: h está 3 después de e") {
+      assert(desplazamientoProbable("h") == 3)
+    }
+
+    test("desplazamientoProbable: hhhaa, con h como la más frecuente") {
+      assert(desplazamientoProbable("hhhaa") == 3)
+    }
+
+    test("desplazamientoProbable: sin letras da 0") {
+      assert(desplazamientoProbable("123") == 0)
+    }
+
+    test("desplazamientoProbable: en empate manda la primera alfabéticamente") {
+      // 'a' y 'h' aparecen tres veces; gana 'a', que está 22 después de 'e'.
+      assert(desplazamientoProbable("hhhaaa") == 22)
+    }
+
+    test("romperCesar: recupera un mensaje con suficientes letras e") {
+      val original = "el mensaje secreto"
+      assert(romperCesar(cesar(original, 7)) == original)
+    }
+
+    test("romperCesar: el método falla cuando la e no es la más frecuente") {
+      // En este mensaje la letra más frecuente es la 'a', no la 'e'.
+      val original = "cada casa amarilla"
+      assert(romperCesar(cesar(original, 7)) != original)
+    }
+
+    // Punto 5 -------------------------------------------------------------------
+
+    test("combinaciones: con longitud 0 hay un mensaje, el vacío") {
+      assert(combinaciones(0, 26) == BigInt(1))
+    }
+
+    test("combinaciones: con longitud 1 hay tantos como letras") {
+      assert(combinaciones(1, 26) == BigInt(26))
+    }
+
+    test("combinaciones: 3 letras sobre 26 dan 16250") {
+      assert(combinaciones(3, 26) == BigInt(16250))
+    }
+
+    test("combinaciones: 2 letras sobre un alfabeto de 2 dan 2") {
+      assert(combinaciones(2, 2) == BigInt(2))
+    }
+
+    test("combinaciones: crece según la recurrencia") {
+      assert(combinaciones(5, 4) == BigInt(3) * combinaciones(4, 4))
+    }
+
+    test("vigenere: ataque con la clave sol") {
+      assert(vigenere("ataque", "sol") == "shliip")
+    }
+
+    test("vigenere: hola mundo con la clave ab") {
+      assert(vigenere("hola mundo", "ab") == "hplb mvneo")
+    }
+
+    test("vigenere: con la clave vacía el mensaje no cambia") {
+      assert(vigenere("casa", "") == "casa")
+    }
+
+    test("vigenere: el espacio no consume letra de la clave") {
+      // Sin el espacio la clave iría corrida y la m se cifraría con b.
+      assert(vigenere("hola mundo", "ab").charAt(5) == 'm')
+    }
+
+    test("vigenere: con una clave de una sola letra es un César") {
+      assert(vigenere("hola mundo", "d") == cesar("hola mundo", 3))
+    }
+
   }
-
-  test("frecuencias: aabbbc") {
-    assert(frecuencias("aabbbc") == List(('b', 3), ('a', 2), ('c', 1)))
-  }
-
-  test("frecuencias: hola mundo") {
-    assert(frecuencias("hola mundo") ==
-      List(('o', 2), ('a', 1), ('d', 1), ('h', 1), ('l', 1), ('m', 1),
-           ('n', 1), ('u', 1)))
-  }
-
-  test("frecuencias: el mensaje vacío no tiene letras") {
-    assert(frecuencias("") == List())
-  }
-
-  test("frecuencias: un mensaje sin letras no tiene frecuencias") {
-    assert(frecuencias("123 !?") == List())
-  }
-
-  test("frecuencias: en empate manda el orden alfabético") {
-    assert(frecuencias("ba") == List(('a', 1), ('b', 1)))
-  }
-
-  // Punto 4 -------------------------------------------------------------------
-
-  test("desplazamientoProbable: h está 3 después de e") {
-    assert(desplazamientoProbable("h") == 3)
-  }
-
-  test("desplazamientoProbable: hhhaa, con h como la más frecuente") {
-    assert(desplazamientoProbable("hhhaa") == 3)
-  }
-
-  test("desplazamientoProbable: sin letras da 0") {
-    assert(desplazamientoProbable("123") == 0)
-  }
-
-  test("desplazamientoProbable: en empate manda la primera alfabéticamente") {
-    // 'a' y 'h' aparecen tres veces; gana 'a', que está 22 después de 'e'.
-    assert(desplazamientoProbable("hhhaaa") == 22)
-  }
-
-  test("romperCesar: recupera un mensaje con suficientes letras e") {
-    val original = "el mensaje secreto"
-    assert(romperCesar(cesar(original, 7)) == original)
-  }
-
-  test("romperCesar: el método falla cuando la e no es la más frecuente") {
-    // En este mensaje la letra más frecuente es la 'a', no la 'e'.
-    val original = "cada casa amarilla"
-    assert(romperCesar(cesar(original, 7)) != original)
-  }
-
-  // Punto 5 -------------------------------------------------------------------
-
-  test("combinaciones: con longitud 0 hay un mensaje, el vacío") {
-    assert(combinaciones(0, 26) == BigInt(1))
-  }
-
-  test("combinaciones: con longitud 1 hay tantos como letras") {
-    assert(combinaciones(1, 26) == BigInt(26))
-  }
-
-  test("combinaciones: 3 letras sobre 26 dan 16250") {
-    assert(combinaciones(3, 26) == BigInt(16250))
-  }
-
-  test("combinaciones: 2 letras sobre un alfabeto de 2 dan 2") {
-    assert(combinaciones(2, 2) == BigInt(2))
-  }
-
-  test("combinaciones: crece según la recurrencia") {
-    assert(combinaciones(5, 4) == BigInt(3) * combinaciones(4, 4))
-  }
-
-  test("vigenere: ataque con la clave sol") {
-    assert(vigenere("ataque", "sol") == "shliip")
-  }
-
-  test("vigenere: hola mundo con la clave ab") {
-    assert(vigenere("hola mundo", "ab") == "hplb mvneo")
-  }
-
-  test("vigenere: con la clave vacía el mensaje no cambia") {
-    assert(vigenere("casa", "") == "casa")
-  }
-
-  test("vigenere: el espacio no consume letra de la clave") {
-    // Sin el espacio la clave iría corrida y la m se cifraría con b.
-    assert(vigenere("hola mundo", "ab").charAt(5) == 'm')
-  }
-
-  test("vigenere: con una clave de una sola letra es un César") {
-    assert(vigenere("hola mundo", "d") == cesar("hola mundo", 3))
-  }
-}
