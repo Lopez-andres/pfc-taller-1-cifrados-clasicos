@@ -124,7 +124,7 @@ class CifradosClasicos {
         val letraMensaje = m.head
         if (esMinuscula(letraMensaje)) {
           val indiceClave = ((letraMensaje - 'a') + (claveActual.head.toInt - 'a'.toInt) % letras + letras) % letras
-          (indiceClave + 'a').toChar + auxClave(m.tail, claveRestante)
+          (indiceClave + 'a').toChar + auxClave(m.tail, claveActual.tail)
         } else letraMensaje + auxClave(m.tail, claveRestante)
       }
     }
