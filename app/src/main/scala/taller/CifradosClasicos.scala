@@ -40,8 +40,65 @@ class CifradosClasicos {
   /**
    * Cuenta las letras minúsculas del mensaje, de mayor a menor frecuencia y,
    * en empate, en orden alfabético. El recorrido es recursivo de cola.
+   *
    */
-  def frecuencias(m: Mensaje): Frecuencias = ???
+  def frecuencias(m: Mensaje): Frecuencias = {
+    // Cuenta cuantas veces aparece una letra específica en el mensaje
+    @tailrec
+    def calcularLetras(mensajeSobra: Mensaje, letra: Char, totalLetra:Int): Int = {
+      // Caso base: Cuando no hay caracteres por revisar
+      if (mensajeSobra.isEmpty) {
+        totalLetra
+      }
+      // Si el caracter actual coincide con la letra buscada
+      // aumenta el acumulador en 1
+      else if (mensajeSobra.head == letra) {
+          calcularLetras(mensajeSobra.tail, letra, totalLetra + 1)
+      }
+      // Si no coincide, continua con el mismo acumulador
+      else{
+        calcularLetras(mensajeSobra.tail,letra, totalLetra)
+      }
+    }
+    // Recorre las letras desde 'a' hasta la 'z'
+    // Construyendo la lista de frecuencias
+    @tailrec
+    def examinarLetra(letra: Char, guardar: Frecuencias): Frecuencias = {
+      // Caso base: Cuando se revisaron todas las letras
+      if(letra > 'z'){
+        // Ordena de mayor a menor la frecuencia
+        // Si hay frecuencias iguales, se ordena alfabéticamente
+        guardar.sortWith((a,b) =>
+            if(a._2 == b._2){
+              a._1 < b._1
+            }
+            else{
+              a._2 > b._2
+             }
+        )
+      }
+      else{
+          // Calcula cuantas veces aparece la letra actual
+          val totalLetra: Int = calcularLetras(m, letra, 0)
+          // Si aparece al menos una vez
+          // Se agrega la letra con su frecuencia
+          if (totalLetra>0){
+            val listaNueva: Frecuencias = guardar :+ (letra, totalLetra)
+            // Avanza a la siguente letra del alfabeto
+            examinarLetra((letra.toInt + 1 ).toChar, listaNueva)
+          }
+          // Si no aparece, no se agrega a la lista
+          else{
+            // Avanza a la siguiente letra
+            examinarLetra((letra.toInt + 1) .toChar, guardar)
+          }
+      }
+
+    }
+    // La revisión comienza desde la letra 'a'
+    // con una lista de frecuencias vacías
+    examinarLetra('a',List())
+  }
 
   // Punto 4 -------------------------------------------------------------------
 

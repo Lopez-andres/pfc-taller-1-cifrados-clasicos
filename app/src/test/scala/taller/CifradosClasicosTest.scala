@@ -80,6 +80,26 @@ class CifradosClasicosTest extends AnyFunSuite {
     assert(frecuencias("ba") == List(('a', 1), ('b', 1)))
   }
 
+  // Nuevos test punto 3
+  test("Extra 1 - Ignora mayusculas"){
+    assert(frecuencias("aAcCBb") == List(('a',1), ('b',1), ('c',1)))
+  }
+
+  test("Extra 2 - Una sola letra repetida"){
+    assert(frecuencias("zzzzz") == List(('z', 5)))
+  }
+
+ test("Extra 3 - Ordena por mayor frecuencia"){
+   assert(frecuencias("qqqpp") == List(('q', 3), ('p', 2)))
+ }
+
+  test("Extra 4 - Empate de 3 letras en orden alfabético "){
+    assert(frecuencias("ccbbaa") == List(('a', 2), ('b', 2), ('c', 2)))
+  }
+
+  test("Extra 5 - Combinación de frecuencia y empate alfabético "){
+    assert(frecuencias("rrssstt") == List(('s', 3), ('r', 2), ('t', 2)))
+  }
   // Punto 4 -------------------------------------------------------------------
 
   test("desplazamientoProbable: h está 3 después de e") {
