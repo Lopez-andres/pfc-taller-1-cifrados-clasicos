@@ -165,6 +165,45 @@ class CifradosClasicosTest extends AnyFunSuite {
       assert(romperCesar(cesar(original, 7)) != original)
     }
 
+    // test - andres
+  test("desplazamientoProbable: si la letra más frecuente es la e, el desplazamiento es 0") {
+    assert(desplazamientoProbable("eee") == 0)
+  }
+
+  test("desplazamientoProbable: una z dominante da 21") {
+    assert(desplazamientoProbable("zzzy") == 21)
+  }
+
+  test("desplazamientoProbable: en un empate gana la b y el resultado envuelve a 23") {
+    // b y c aparecen una vez; gana b, que está antes de la e, así que (1 - 4) mod 26 = 23.
+    assert(desplazamientoProbable("cb") == 23)
+  }
+
+  test("desplazamientoProbable: ignora los espacios, signos y digitos") {
+    assert(desplazamientoProbable("xx, 99!") == 19)
+  }
+
+  test("romperCesar: recupera varios mensajes con la e como letra dominante") {
+    val originales = List(
+      "esta es una prueba de eventos de verdad",
+      "tres tristes tigres comen en el desierto",
+      "el elefante se detiene en el verde bosque"
+    )
+    val desplazamientos = List(1, 5, 13, 25, 26, -3, 30)
+    assert(originales.forall(o => desplazamientos.forall(k => romperCesar(cesar(o, k)) == o)))
+  }
+
+  test("romperCesar: descifra hvh como ese y conserva los signos") {
+    assert(romperCesar("hvh") == "ese")
+    assert(romperCesar("hvh, hvh!") == "ese, ese!")
+  }
+
+  test("romperCesar: falla por empate cuando la e pierde el desempate alfabético") {
+    // ez con k = 2 da gb; en gb gana la b, el desplazamiento estimado es 23 y sale je.
+    assert(romperCesar(cesar("ez", 2)) == "je")
+    assert(romperCesar(cesar("ez", 2)) != "ez")
+  }
+
     // Punto 5 -------------------------------------------------------------------
 
     test("combinaciones: con longitud 0 hay un mensaje, el vacío") {
@@ -187,6 +226,48 @@ class CifradosClasicosTest extends AnyFunSuite {
       assert(combinaciones(5, 4) == BigInt(3) * combinaciones(4, 4))
     }
 
+    // test andres
+    test("combinaciones: 4 letras y longitud 4 dan 24") {
+      assert(combinaciones(4, 3) == BigInt(24))
+    }
+
+    test("combinaciones: con 2 letras solo hay mensajes que alternan") {
+      assert(combinaciones(5, 2) == BigInt(2))
+    }
+
+    test("combinaciones: con una sola letra no hay mensajes de más de una letra") {
+      assert(combinaciones(3, 1) == BigInt(0))
+    }
+
+    test("combinaciones: el resultado supera el rango de Int") {
+      assert(combinaciones(20, 26) == BigInt(26) * BigInt(25).pow(19))
+    }
+
+    test("combinaciones: coincide con la forma cerrada a por (a-1) a la n-1") {
+      val casos = List((1,5), (2,5), (6,3), (8,4))
+      assert(casos.forall { case (n, a) => combinaciones(n, a) == BigInt(a) * BigInt(a - 1).pow(n - 1)})
+    }
+
+    test("vigenere: ab c con la clave bd, el espacio no gasta clave") {
+      assert(vigenere("ab c", "bd") == "be d")
+    }
+
+    test("vigenere: una clave más larga que el mensaje solo usa su inicio") {
+      assert(vigenere("hi", "zzzz") == "gh")
+    }
+
+    test("vigenere: la clave se reinicia al terminarse") {
+      assert(vigenere("aaaaa", "abc") == "abcab")
+    }
+
+    test("vigenere: no cifra mayúsculas ni signos y no gasta clave en ellos") {
+      assert(vigenere("Hola, Mundo!", "ab") == "Homa, Mvneo!")
+    }
+
+    test("vigenere: varios espacios seguidos se copian sin consumir clave") {
+      assert(vigenere("  a b", "bc") == "  b d")
+    }
+
     test("vigenere: ataque con la clave sol") {
       assert(vigenere("ataque", "sol") == "shliip")
     }
@@ -207,5 +288,9 @@ class CifradosClasicosTest extends AnyFunSuite {
     test("vigenere: con una clave de una sola letra es un César") {
       assert(vigenere("hola mundo", "d") == cesar("hola mundo", 3))
     }
+
+
+
+
 
   }
