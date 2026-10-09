@@ -563,46 +563,42 @@ Por último, el programa cesarCola es correcto con respecto a la especificación
 
 
 ## Punto 3: Conteo de frecuencias con recursión de cola
-Sea $F: Mensaje -> Frecuencias$
+Sea $F: \text{Mensaje} \rightarrow  \text{Frecuencias}$
 
-- F(m): Función que representa el resultado correcto que debe de devolver ´frecuencias´
-  para un mensaje 'm', según la especificación. Como tal es lo que debería de devolver según la definición matematica
+- `F(m)`: Función que representa el resultado correcto que debe de devolver `frecuencias`
+  para un mensaje 'm', según la especificación. Como tal es lo que debería de devolver según la definición matemática
 
 
-La función recibe un mensaje y devuelve una lista con cada letra minúscula que aparezca dentro de el y
-la cantidad de veces que aparece cada letra, el resultado debe de estár ordenado de mayor a menor frecuencia,
-y que cuando 2 o más letras tengan la misma frecuencia, debe utilizarse el orden alfabético.
+La función recibe un mensaje y devuelve una lista con cada letra minúscula que aparezca dentro de él y
+la cantidad de veces que aparece cada letra, el resultado debe de estar ordenado de mayor a menor frecuencia,
+y cuando 2 o más letras tengan la misma frecuencia, debe utilizarse el orden alfabético.
 
-Se muestra que: Para cualquier mensaje de 'm' el programa $P_F(m)$ debe de dar el mismo resultado que
+Se muestra que: Para cualquier mensaje 'm' el programa $P_F(m)$ debe dar el mismo resultado que
 la función $F$
 
 $$ \forall m \in \text{Mensaje} : P_F(m) = F(m) $$
 
-- $P_F(m)$: Resultado que devuelve el programa de ´frecuencias´ con el mensaje ´m.´.
+- $P_F(m)$: Resultado que devuelve el programa de `frecuencias` con el mensaje `m`.
 
-La función 'frecuencias' como se sabe
+La función `frecuencias` se apoya en 2 funciones auxiliares:
 
-- ´calcularLetras´: Que cuenta cuantas veces aparece una letra determinada
-- 'examinarLetra': Que revisa las letras desde 'a' hasta la 'z' y construye la lista de frecuencias
+- `calcularLetras`: Que cuenta cuantas veces aparece una letra determinada
+- `examinarLetra`: Que revisa las letras desde 'a' hasta la 'z' y construye la lista de frecuencias
 
-### 1. Corrección de `calcularLetras´
+### 1. Corrección de `calcularLetras`
 
-Sea $C(m, l, t)$
-
-La función que recibe:
+Sea $C(m, l, t)$ la función `calcularLetras`, que recibe:
 - $m$: La parte del mensaje que todavía no se ha recorrido
 - $l$: La letra que se desea contar
 - $t$: La cantidad de apariciones encontradas hasta el momento
 
-Como tal el objetivo es demostrar que ´calcularLetras´ si devuelva la cantidad total de
-apariciones de la letra $l$.
+Sea $\#_l(m)$ la cantidad de veces que aparece $l$ en $m$. Se desea demostrar que `calcularLetras` devuelve el total de apariciones de $l$.
 
-La propiedad que se mantiene durante la ejecución es $ t $,
-porque contiene la cantidad de apariciones de la letra $l$ encontrada en el mensaje
-que ya fue recorrido.
+**Invariante.** Para todo $m$, $l$ y $t$:
 
-La demostración se realiza analizando 2 casos posibles de 'mensajeSobra' :
-cuando está vacío y cuando todavía contiene letras.
+$$ C(m, l, t) = t + \#_l(m) $$
+
+Se demuestra por inducción estructural sobre $m$. Con $t = 0$  en la llamada inicial, esto da $C(m, l, 0) = \#_l(m)$.
 
 ### Caso base: mensajeSobra = ""
 
@@ -615,16 +611,12 @@ if (mensajeSobra.isEmpty){
 - 'mensajeSobra': El mensaje que falta por recorrer
 - '.isEmpty': Es el que pregunta si no queda nada en 'mensajeSobra'
 
-Por lo tanto, $C("", l, t) = t$, como ya no quedan caracteres (letras) por revisar,
-el valor de $t$ ya tiene el total de veces que apareció la letra $l$ en el mensaje.
-
-Entonces cuando ya no quedan letras por revisar, la función devuelve correctamente
-el total contado.
-
+Por lo tanto, $C(\varepsilon, l, t) = t = t + \#_l(\varepsilon)$, porque $\#_l(\varepsilon) = 0$.
+El invariante se cumple en el caso base. 
 
 ### Caso inducción: Donde hay letras que revisar
 
-Sea $mensajeSobra = c + r $ donde
+Sea $\text{mensajeSobra} = c \cdot r$ donde
 
 - $c$ : Es el primer carácter
 - $r$ : Es el resto de mensaje
@@ -632,7 +624,7 @@ Sea $mensajeSobra = c + r $ donde
 Entonces se analizan 2 casos:
 
 
-#### Primer caso: c = l Se encuentra una aparición de la letra buscada
+#### Primer caso:$c = l$ Se encuentra una aparición de la letra buscada.
 
 Si el primer carácter coincide con la letra buscada: 'c = l'
 ```scala
@@ -649,16 +641,22 @@ calcularLetras(mensajeSobra.tail, letra, totalLetra + 1)
 - '.tail': Devuelve todo lo que queda del mensaje después de quitar
   el primer carácter
 
-$ C(c + r, l, t) -> C(r, l, t +1)$
+$ C(c \cdot r, l, t) \rightarrow C(r, l, t +1)$
 (Si la letra actual es la que estamos buscando, se suma 1 al contador,
 y se continúa revisando el resto del mensaje)
 
-Como se encontró la letra $l$, aumentamos el contador en 1, luego la función continúa revisando
-el resto del mensaje para seguir contando cuantas veces aparece esta, por tanto
-$ C(c + r, l, t)$ devuelve correctamente el número total de apariciones de $l$.
+- **Hipótesis de inducción:** $C(r, l, t') = t' + \#_l(r)$ para todo $t'$.
+- Como $c = l$, $\#_l(c \cdot r) = 1 + \#_l(r)$. Entonces:
 
+$$
+\begin{aligned}
+C(c \cdot r, l, t) &\rightarrow C(r, l, t+1) \\
+&= (t+1) + \#_l(r) \quad \text{(por la hipótesis de inducción)} \\
+&= t + \#_l(c \cdot r)
+\end{aligned}
+$$
 
-#### Segundo caso: c \neq l Cuando el carácter no coincide con la letra buscada
+#### Segundo caso: $c \neq l$, el carácter no coincide con la letra buscada.
 
 Si el primer carácter no es igual a la letra que se busca $c \neq l$,
 entonces la función realiza:
@@ -666,12 +664,19 @@ entonces la función realiza:
 ```scala
 calcularLetras(mensajeSobra.tail, letra, totalLetra)
 ```
-Es decir $ C(c + r, l, t) -> C(r, l, t)$
-(EL carácter actual $c$ no coincide con la letra $l$ buscada. Entonces se ignora está,
-el contador no cambia y se sigue revisando el resto del mensaje con el mismo valor que está en el contador)
+Es decir $ C(c \cdot r, l, t) \rightarrow C(r, l, t)$
 
-Teniendo esto en cuenta se puede decir que el resultado del caso es correcto
+Como $c \neq l$, $\#_l(c \cdot r) = \#_l(r)$. Entonces:
 
+$$
+\begin{aligned}
+C(c \cdot r, l, t) &\rightarrow C(r, l, t) \\
+&= t + \#_l(r) \quad \text{(por la hipótesis de inducción)} \\
+&= t + \#_l(c \cdot r)
+\end{aligned}
+$$
+
+En ambos casos se cumple el invariante, por lo tanto $C(m, l, t) = t + \#_l(m)$ para todo $m$.
 
 #### Terminación de 'calcularLetra'
 
@@ -717,6 +722,16 @@ examinarLetra('a', List())
 Por lo tanto, inicialmente es $g = []$ (g está vacío) y todavía no se ha examinado las letras
 
 - $g$: Lista de letras ya examinadas que aparecen en el mensaje junto con su frecuencia
+
+
+
+Sea $\#_x(m)$ la cantidad de apariciones de $x$ en $m$.
+
+**Invariante.** En cada llamada `examinarLetra(l, g)`, con $l$ entre `'a'` y el carácter siguiente a `'z'`, $g$ es la lista de parejas $(x, \#_x(m))$, en orden alfabético, para cada letra $x$ con `'a'` $\leq x < l$ y $\#_x(m) > 0$.
+
+  - **Estado inicial:** $l =$ `'a'` y $g = []$. No hay letras $x < l$, así que se cumple.
+  - **Se conserva:** por la corrección de `calcularLetras`, `totalLetra` $= \#_l(m)$. Si es $> 0$ se agrega $(l, \#_l(m))$ al final de $g$, que sigue en orden alfabético porque $l$ es mayor que las anteriores. Si es $0$, $g$ no cambia. En ambos casos el invariante vale para $l+1$.
+  - **Estado final:** con $l >$ `'z'`, $g$ tiene exactamente las parejas $(x, \#_x(m))$ con $\#_x(m) > 0$, todavía sin ordenar por frecuencia.
 
 #### Caso base
 Ocurre cuando:
@@ -840,7 +855,7 @@ if(letra > 'z')
 ```
 Por lo tanto, examinarLetra siempre va a terminar.
 
-## 3. Corrección del ordenamiento
+### 3. Corrección del ordenamiento
 
 Después de que esté construida la lista de las frecuencias,
 la función utilizada es:
@@ -873,7 +888,7 @@ ordenada de mayor a menor
 Si tienen la misma frecuencia 'f1 = f2', ya no se puede ordenar por la cantidad de frecuencia,
 entonces se usa el orden alfabético para decidir quien va primero.
 
-La función para comparar las letras $l_1 < l_2$
+Cuando $f_1 = f_2$ el comparador usa $l_1 < l_2$. Como cada letra aparece una sola vez en la lista, $l_1 \neq l_2$, así que el orden es total y el resultado es único.
 
 Ejemplo:
 ```scala
@@ -906,6 +921,10 @@ Se demostró que:
 5. En caso de empate, se utiliza el sistema de ordenamiento alfabético en inglés
 6. El acumulador 'totalLetra' conserva correctamente el conteo de apariciones durante la recursión
 7. Solo se agregan a la lista las letras cuya frecuencia > 0
+
+   
+
+Por el invariante de `examinarLetra`, al terminar el recorrido $g$ tiene exactamente las parejas $(x, \#_x(m))$ con $\#_x(m) > 0$. `sortWith` las ordena por frecuencia descendente y, en empate, alfabéticamente, que es justo $F(m)$.
 
 Teniendo en cuenta lo anterior se puede decir que:
 $ \forall m \in \text{Mensaje}:P_F(m) = F(m)$
@@ -1224,7 +1243,7 @@ Como $0 \leq \text{pos}(x) \leq 25$, entonces $\text{pos}(x) \% 26 = \text{pos}(
 La suma $\text{pos}(c) + \text{pos}(x) + 26$ es positiva, y sumar 26 no cambia el
 residuo, por lo que `%` coincide con el módulo matemático y da $(\text{pos}(c) + \text{pos}(x)) \bmod 26$. Sumarle `'a'` da la letra $s(c,x)$.
 
-#### consigna principal
+#### consigna principal.
 
 $$
 \forall m \;\; \forall r \in R : P_a(m,r) == V(m, \iota(r))
